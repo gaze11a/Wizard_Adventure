@@ -136,7 +136,6 @@ void UpdateBullets(Game& game) {
     }
 }
 
-
 void FireBullet(Game& game) {
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (!game.bullets[i].active) {
@@ -151,22 +150,28 @@ void FireBullet(Game& game) {
 }
 
 void DebugDrawHitbox(Enemy enemy) {
-    int originalWidth, originalHeight;
-    GetGraphSize(enemy.isDragon ? dragonIMG : enemyIMG, &originalWidth, &originalHeight);
+    int hitboxWidth, hitboxHeight = 29;  // c‚Ì“–‚½‚è”»’è‚Í‰Î‚Ì‹Ê‚Æ“¯‚¶
 
-    float scale = enemy.isDragon ? 0.3f : 0.1f;
-    int hitboxWidth = (int)(originalWidth * scale);
-    int hitboxHeight = (int)(originalHeight * scale);
+    if (enemy.isDragon) {
+        int originalWidth, originalHeight;
+        GetGraphSize(dragonIMG, &originalWidth, &originalHeight);
+        hitboxWidth = (int)(originalWidth * 0.2f); // ƒhƒ‰ƒSƒ“‚ÍƒXƒP[ƒ‹ 0.2
+    }
+    else {
+        hitboxWidth = 29;  // ‰Î‚Ì‹Ê‚Ì“–‚½‚è”»’è‚Í•ÏX‚È‚µ
+    }
 
+    // Ô‚¢˜g‚Å“–‚½‚è”»’è‚ð‰ÂŽ‹‰»
     DrawBox(enemy.x - hitboxWidth / 2, enemy.y - hitboxHeight / 2,
         enemy.x + hitboxWidth / 2, enemy.y + hitboxHeight / 2,
         GetColor(255, 0, 0), FALSE);
 }
 
+
 void UpdateEnemies(Game& game) {
-	DebugDrawHitbox(game.enemies[0]);
-    DebugDrawHitbox(game.enemies[1]);
-    DebugDrawHitbox(game.enemies[2]);
+	// DebugDrawHitbox(game.enemies[0]);
+    // DebugDrawHitbox(game.enemies[1]);
+    // DebugDrawHitbox(game.enemies[2]);
 
     // 5000m ‚²‚Æ‚É‘¬“x‚ð‘‰Á (Å‘å6px/frame)
     int enemySpeed = min(3 + (game.L / 5000), 7);
@@ -205,7 +210,7 @@ void UpdateEnemies(Game& game) {
         }
 
         if (enemy.isDragon) {
-            DrawRotaGraph(enemy.x, enemy.y, 0.3, 0.0, dragonIMG, TRUE);
+            DrawRotaGraph(enemy.x, enemy.y, 0.2, 0.0, dragonIMG, TRUE);
         }
         else {
             DrawRotaGraph(enemy.x, enemy.y, 0.12, 0.0, enemyIMG, TRUE);

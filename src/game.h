@@ -68,6 +68,8 @@ bool CheckCollisionWithPlayer(Game& game, Enemy enemy);
 
 void UpdateBullets(Game& game);
 void FireBullet(Game& game);
+
+void DebugDrawHitbox(Enemy enemy);
 void UpdateEnemies(Game& game);
 
 #endif
