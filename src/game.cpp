@@ -22,22 +22,22 @@ void InitGame(Game& game) {
 
     SetFontSize(20);
 
-    titlelogo = LoadGraph("fig/title.webp");
-	charactor = LoadGraph("fig/charactor.png");
-    back[0] = LoadGraph("fig/back01.jpg");
-    back[1] = LoadGraph("fig/back02.jpg");
-    back[2] = LoadGraph("fig/back03.jpg");
+    titlelogo = LoadGraph("assets/fig/title.webp");
+	charactor = LoadGraph("assets/fig/charactor.png");
+    back[0] = LoadGraph("assets/fig/back01.jpg");
+    back[1] = LoadGraph("assets/fig/back02.jpg");
+    back[2] = LoadGraph("assets/fig/back03.jpg");
 
-    bulletIMG = LoadGraph("fig/bullet.png");
+    bulletIMG = LoadGraph("assets/fig/bullet.png");
     for (int i = 0; i < MAX_BULLETS; i++) {
         game.bullets[i] = { 60, false }; // xÀ•W, yÀ•W
     }
     game.bulletnum = 3;
     game.shot = 0;
 
-    enemyIMG = LoadGraph("fig/fire.png");
-    dragonIMG = LoadGraph("fig/dragon.png");
-    heartIMG = LoadGraph("fig/heart.png");
+    enemyIMG = LoadGraph("assets/fig/fire.png");
+    dragonIMG = LoadGraph("assets/fig/dragon.png");
+    heartIMG = LoadGraph("assets/fig/heart.png");
 
     int baseX = 640; // Šî€‚Æ‚È‚éXÀ•W
     int minGap = 150; // Å¬ŠÔŠu
@@ -53,7 +53,7 @@ void InitGame(Game& game) {
 
 void LoadHighScore(Game& game) {
     FILE* fp;
-    fopen_s(&fp, "save.dat", "rb");
+    fopen_s(&fp, "assets/save.dat", "rb");
     if (fp) {
         fread(&game.L_max, sizeof(int), 1, fp);
         fread(&game.high_score, sizeof(int), 1, fp);
@@ -70,7 +70,7 @@ void SaveHighScore(Game& game) {
     }
 
     FILE* fp;
-    fopen_s(&fp, "save.dat", "wb");
+    fopen_s(&fp, "assets/save.dat", "wb");
     if (fp) {
         fwrite(&game.L_max, sizeof(int), 1, fp);
         fwrite(&game.high_score, sizeof(int), 1, fp);
