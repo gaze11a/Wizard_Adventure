@@ -195,14 +195,9 @@ void UpdateEnemies(Game& game) {
             enemy.y = 120 + i * 100;  // Y位置を一定間隔で維持
             enemy.spawn = GetRand(300) + 600; // 次のスポーンを遅くする
 
-            if (game.L >= 10000) {
-                int dragonChance = min(10 + (game.L / 5000) * 5, 50); // 最大50%の確率
-                if (GetRand(100) < dragonChance) {
-                    enemy.isDragon = true;
-                }
-                else {
-                    enemy.isDragon = false;
-                }
+            int dragonChance = min(10 + (game.L / 5000) * 5, 50); // 最大50%の確率
+            if (GetRand(100) < dragonChance) {
+                enemy.isDragon = true;
             }
             else {
                 enemy.isDragon = false;
