@@ -176,7 +176,7 @@ void HandleGameOver(Game& game) {
 
     if (Key[KEY_INPUT_SPACE] == 1) {
         InitGame(game);
-        WaitTimer(100);
+        WaitTimer(1000);
         game.state = PLAYING;
     }
 }

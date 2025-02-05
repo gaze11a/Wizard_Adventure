@@ -79,7 +79,7 @@ void SaveHighScore(Game& game) {
     }
 }
 
-bool CheckCollision(Bullet bullet, Enemy enemy) {
+bool CheckCollisionWithBullet(Bullet bullet, Enemy enemy) {
 	int hitboxExpansion = 20; // 当たり判定を広げる
 
     return bullet.x >= enemy.x - 20 && bullet.x <= enemy.x + 20 && 
@@ -87,9 +87,31 @@ bool CheckCollision(Bullet bullet, Enemy enemy) {
 		bullet.y <= enemy.y + (29 + hitboxExpansion); // y方向の上限
 }
 
+bool CheckCollisionWithPlayer(Game& game, Enemy enemy) {
+    int hitboxWidth, hitboxHeight = 29;  // 縦の当たり判定は火の玉と同じ
+
+    if (enemy.isDragon) {
+        // ドラゴンの画像サイズを取得
+        int originalWidth, originalHeight;
+        GetGraphSize(dragonIMG, &originalWidth, &originalHeight);
+
+        // スケールを適用（0.3 倍）
+        hitboxWidth = (int)(originalWidth * 0.3f);
+    }
+    else {
+        // 火の玉の当たり判定は変更なし
+        hitboxWidth = 29;
+    }
+
+    // 当たり判定（中央基準）
+    return (enemy.x < 147 + hitboxWidth / 2 && enemy.x > 22 - hitboxWidth / 2 &&
+        300 - game.y - (26 + hitboxHeight / 2) < enemy.y + hitboxHeight / 2 &&
+        300 - game.y + (26 + hitboxHeight / 2) > enemy.y - hitboxHeight / 2);
+}
+
+
 
 void UpdateBullets(Game& game) {
-
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (game.bullets[i].active) {
             game.bullets[i].x += 5; // ゆっくり移動
@@ -100,7 +122,7 @@ void UpdateBullets(Game& game) {
             SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
             for (int j = 0; j < MAX_ENEMIES; j++) {
-                if (CheckCollision(game.bullets[i], game.enemies[j])) {
+                if (CheckCollisionWithBullet(game.bullets[i], game.enemies[j])) {
                     game.bullets[i].active = false; // 弾を消す
                     game.enemies[j].x = 640 + GetRand(200); // 敵をリスポーン
                     game.score += 100; // ポイント加算
@@ -128,8 +150,24 @@ void FireBullet(Game& game) {
     game.shot = game.L; // 最後に撃った位置を記録
 }
 
+void DebugDrawHitbox(Enemy enemy) {
+    int originalWidth, originalHeight;
+    GetGraphSize(enemy.isDragon ? dragonIMG : enemyIMG, &originalWidth, &originalHeight);
+
+    float scale = enemy.isDragon ? 0.3f : 0.1f;
+    int hitboxWidth = (int)(originalWidth * scale);
+    int hitboxHeight = (int)(originalHeight * scale);
+
+    DrawBox(enemy.x - hitboxWidth / 2, enemy.y - hitboxHeight / 2,
+        enemy.x + hitboxWidth / 2, enemy.y + hitboxHeight / 2,
+        GetColor(255, 0, 0), FALSE);
+}
 
 void UpdateEnemies(Game& game) {
+	DebugDrawHitbox(game.enemies[0]);
+    DebugDrawHitbox(game.enemies[1]);
+    DebugDrawHitbox(game.enemies[2]);
+
     // 5000m ごとに速度を増加 (最大6px/frame)
     int enemySpeed = min(3 + (game.L / 5000), 7);
 
@@ -174,7 +212,7 @@ void UpdateEnemies(Game& game) {
         }
 
         for (int j = 0; j < MAX_BULLETS; j++) {
-            if (game.bullets[j].active && CheckCollision(game.bullets[j], enemy)) {
+            if (game.bullets[j].active && CheckCollisionWithBullet(game.bullets[j], enemy)) {
                 game.bullets[j].active = false;
 
                 // ポイント加算
@@ -193,8 +231,7 @@ void UpdateEnemies(Game& game) {
         }
 
         // キャラクターと敵がぶつかったとき
-        if (enemy.x < 147 && enemy.x > 22 &&
-            300 - game.y - 26 < enemy.y + 29 && 300 - game.y + 26 > enemy.y - 29) {
+        if (CheckCollisionWithPlayer(game, enemy)) {
 			PlaySE(hitSE);
 
             if (enemy.isDragon) {

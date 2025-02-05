@@ -63,7 +63,8 @@ void InitGame(Game& game);
 void LoadHighScore(Game& game);
 void SaveHighScore(Game& game);
 
-bool CheckCollision(Bullet bullet, Enemy enemy);
+bool CheckCollisionWithBullet(Bullet bullet, Enemy enemy);
+bool CheckCollisionWithPlayer(Game& game, Enemy enemy);
 
 void UpdateBullets(Game& game);
 void FireBullet(Game& game);
