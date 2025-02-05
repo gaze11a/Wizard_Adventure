@@ -7,13 +7,13 @@
 火の玉やドラゴンを避けながら、魔法を放って敵を倒そう！
 
 ## 🎥 ゲームプレイ動画
-<p align="center">
+<p">
   <a href="https://www.youtube.com/watch?v=6HVtYUd7e3c">
     <img src="https://img.youtube.com/vi/6HVtYUd7e3c/0.jpg" alt="ゲームプレイ" width="480">
   </a>
 </p>
 
-<p align="center">
+<p>
   画像をクリックすると YouTube で動画を再生できます！
 </p>
 
