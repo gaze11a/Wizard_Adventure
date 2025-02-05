@@ -1,4 +1,4 @@
-#pragma warning(disable : 4996) // fopenƒGƒ‰[‰ğœ
+ï»¿#pragma warning(disable : 4996) // fopenã‚¨ãƒ©ãƒ¼è§£é™¤
 
 #include "DxLib.h"
 #include <stdio.h>
@@ -7,12 +7,11 @@
 #define MAX_BULLETS 5
 #define MAX_ENEMIES 3
 
-// –¢À‘•‹@”\
+// æœªå®Ÿè£…æ©Ÿèƒ½
 // 
-// “G‚ÌƒXƒ|[ƒ“‚ğ™X‚É‘‚ß‚éAƒhƒ‰ƒSƒ“‚Ì’Ç‰Á
-// ƒ‰ƒCƒt‹@”\iÅ‰3‚ÂA‰Î‚É“–‚½‚Á‚½‚ç1ŒÂƒ}ƒCƒiƒXAƒhƒ‰ƒSƒ“‚Í‘¦€j
-// Œø‰Ê‰¹‚Ì’Ç‰Á
-// İ’èiŒø‰Ê‰¹‰¹—Ê’²ßA
+// å³æ­»ãƒ‰ãƒ©ã‚´ãƒ³ã®è¿½åŠ 
+// å®ç®±ã®è¿½åŠ 
+// åŠ¹æœéŸ³ã®è¿½åŠ 
 
 
 struct Bullet {
@@ -39,12 +38,14 @@ struct Game {
     int L_max;
     int score;
     int high_score;
+    int life;
 
     Bullet bullets[MAX_BULLETS];
     int bulletnum;
     int shot;
 
     Enemy enemies[MAX_ENEMIES];
+	int hitTimer;
 };
 
 Game game;
@@ -62,36 +63,41 @@ int gpUpdateKey() {
     return 0;
 }
 
-int bulletSprite;
-int enemySprite;
+// ç”»åƒ
+int bulletIMG;
+int enemyIMG;
+int heartIMG;
 int titlelogo;
 
 void InitGame(Game& game) {
     game.y = 0;
     game.L = 0;
     game.score = 0;
+    game.life = 3;
+
     SetFontSize(20);
 
-    titlelogo = LoadGraph("fig/title2.webp");
+    titlelogo = LoadGraph("fig/title.webp");
 
-    bulletSprite = LoadGraph("fig/bullet00.png");
+    bulletIMG = LoadGraph("fig/bullet.png");
     for (int i = 0; i < MAX_BULLETS; i++) {
-        game.bullets[i] = { 60, false }; // xÀ•W, yÀ•W
+        game.bullets[i] = { 60, false }; // xåº§æ¨™, yåº§æ¨™
     }
-    game.bulletnum = 5;
+    game.bulletnum = 3;
     game.shot = 0;
 
-    enemySprite = LoadGraph("fig/fire.png");
+    enemyIMG = LoadGraph("fig/fire.png");
+	heartIMG = LoadGraph("fig/heart.png");
 
-    int baseX = 640; // Šî€‚Æ‚È‚éXÀ•W
-    int minGap = 150; // Å¬ŠÔŠu
-    int maxGap = 300; // Å‘åŠÔŠu
+    int baseX = 640; // åŸºæº–ã¨ãªã‚‹Xåº§æ¨™
+    int minGap = 150; // æœ€å°é–“éš”
+    int maxGap = 300; // æœ€å¤§é–“éš”
 
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        game.enemies[i].x = baseX + GetRand(maxGap - minGap) + minGap; // ˆê’èŠÔŠu‚ğŠm•Û‚µ‚Â‚Âƒ‰ƒ“ƒ_ƒ€‚É”z’u
-        baseX = game.enemies[i].x; // Ÿ‚Ì“G‚ÌŠî€ˆÊ’u‚ğXV
-        game.enemies[i].y = 120 + i * 100; // ãA’†A‰º‚Ì‡‚É”z’u
-        game.enemies[i].spawn = GetRand(300) + 600; // ‰‰ñ‚ÌƒXƒ|[ƒ“ŠÔŠu‚ğ‚³‚ç‚ÉL‚°‚é
+        game.enemies[i].x = baseX + GetRand(maxGap - minGap) + minGap; // ä¸€å®šé–“éš”ã‚’ç¢ºä¿ã—ã¤ã¤ãƒ©ãƒ³ãƒ€ãƒ ã«é…ç½®
+        baseX = game.enemies[i].x; // æ¬¡ã®æ•µã®åŸºæº–ä½ç½®ã‚’æ›´æ–°
+        game.enemies[i].y = 120 + i * 100; // ä¸Šã€ä¸­ã€ä¸‹ã®é †ã«é…ç½®
+        game.enemies[i].spawn = GetRand(300) + 600; // åˆå›ã®ã‚¹ãƒãƒ¼ãƒ³é–“éš”ã‚’ã•ã‚‰ã«åºƒã’ã‚‹
     }
 }
 
@@ -130,18 +136,18 @@ void UpdateBullets(Game& game) {
 
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (game.bullets[i].active) {
-            game.bullets[i].x += 5; // ‚ä‚Á‚­‚èˆÚ“®
+            game.bullets[i].x += 5; // ã‚†ã£ãã‚Šç§»å‹•
 
-            // ’e‚ğÅ‘O–Ê‚É•`‰æ & ƒXƒP[ƒ‹‚ğ’²®
+            // å¼¾ã‚’æœ€å‰é¢ã«æç”» & ã‚¹ã‚±ãƒ¼ãƒ«ã‚’èª¿æ•´
             SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-            DrawRotaGraph(game.bullets[i].x, game.bullets[i].y, 1.0, 0.0, bulletSprite, TRUE);
+            DrawRotaGraph(game.bullets[i].x, game.bullets[i].y, 1.0, 0.0, bulletIMG, TRUE);
             SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
             for (int j = 0; j < MAX_ENEMIES; j++) {
                 if (CheckCollision(game.bullets[i], game.enemies[j])) {
-                    game.bullets[i].active = false; // ’e‚ğÁ‚·
-                    game.enemies[j].x = 640 + GetRand(200); // “G‚ğƒŠƒXƒ|[ƒ“
-                    game.score += 100; // ƒ|ƒCƒ“ƒg‰ÁZ
+                    game.bullets[i].active = false; // å¼¾ã‚’æ¶ˆã™
+                    game.enemies[j].x = 640 + GetRand(200); // æ•µã‚’ãƒªã‚¹ãƒãƒ¼ãƒ³
+                    game.score += 100; // ãƒã‚¤ãƒ³ãƒˆåŠ ç®—
                 }
             }
 
@@ -156,19 +162,23 @@ void UpdateBullets(Game& game) {
 void FireBullet(Game& game) {
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (!game.bullets[i].active) {
-            game.bullets[i].x = 60; // ƒLƒƒƒ‰ƒNƒ^[‚Ìè‚ÌˆÊ’u
+            game.bullets[i].x = 60; // ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®æ‰‹ã®ä½ç½®
             game.bullets[i].y = 300 - game.y;
             game.bullets[i].active = true;
             break;
         }
     }
     game.bulletnum--;
-    game.shot = game.L; // ÅŒã‚ÉŒ‚‚Á‚½ˆÊ’u‚ğ‹L˜^
+    game.shot = game.L; // æœ€å¾Œã«æ’ƒã£ãŸä½ç½®ã‚’è¨˜éŒ²
 }
 
+
 void UpdateEnemies(Game& game) {
-    int minGap = 150; // “G“¯m‚ÌÅ¬ŠÔŠu
-    int maxGap = 300; // “G“¯m‚ÌÅ‘åŠÔŠu
+    // 5000m ã”ã¨ã«é€Ÿåº¦ã‚’å¢—åŠ  (æœ€å¤§6px/frame)
+    int enemySpeed = min(3 + (game.L / 5000), 7);
+
+    int minGap = 150; // æ•µåŒå£«ã®æœ€å°é–“éš”
+    int maxGap = 300; // æ•µåŒå£«ã®æœ€å¤§é–“éš”
 
     for (int i = 0; i < MAX_ENEMIES; i++) {
         Enemy& enemy = game.enemies[i];
@@ -178,41 +188,55 @@ void UpdateEnemies(Game& game) {
             continue;
         }
 
-        enemy.x -= 2; // “G‚ÌˆÚ“®‘¬“x‚ğ‚³‚ç‚É’x‚­‚·‚é
+        enemy.x -= enemySpeed;
 
         if (enemy.x < -60) {
             int prevX = (i == 0) ? 640 : game.enemies[i - 1].x;
-            enemy.x = prevX + GetRand(maxGap - minGap) + minGap; // ’¼‘O‚Ì“G‚Æ‚ÌŠÔŠu‚ğŠm•Û
-            enemy.y = 120 + i * 100;  // YˆÊ’u‚ğˆê’èŠÔŠu‚ÅˆÛ
-            enemy.spawn = GetRand(300) + 600; // Ÿ‚ÌƒXƒ|[ƒ“‚ğ‚³‚ç‚É’x‚­‚·‚é
+            enemy.x = prevX + GetRand(maxGap - minGap) + minGap; // ç›´å‰ã®æ•µã¨ã®é–“éš”ã‚’ç¢ºä¿
+            enemy.y = 120 + i * 100;  // Yä½ç½®ã‚’ä¸€å®šé–“éš”ã§ç¶­æŒ
+            enemy.spawn = GetRand(300) + 600; // æ¬¡ã®ã‚¹ãƒãƒ¼ãƒ³ã‚’é…ãã™ã‚‹
         }
 
-        DrawRotaGraph(enemy.x, enemy.y, 0.12, 0.0, enemySprite, TRUE);
+        DrawRotaGraph(enemy.x, enemy.y, 0.12, 0.0, enemyIMG, TRUE);
 
         for (int j = 0; j < MAX_BULLETS; j++) {
             if (game.bullets[j].active && CheckCollision(game.bullets[j], enemy)) {
                 int prevX = (i == 0) ? 640 : game.enemies[i - 1].x;
-                enemy.x = prevX + GetRand(maxGap - minGap) + minGap; // ’¼‘O‚Ì“G‚Æ‚ÌŠÔŠu‚ğŠm•Û
+                enemy.x = prevX + GetRand(maxGap - minGap) + minGap; // æ•µã‚’ãƒªã‚¹ãƒãƒ¼ãƒ³
                 enemy.y = 120 + i * 100;
-                enemy.spawn = GetRand(300) + 600; // “|‚³‚ê‚½Œã‚ÌÄoŒ»‚à‚³‚ç‚É’x‚ß‚É
+                enemy.spawn = GetRand(300) + 600;
                 game.bullets[j].active = false;
-                game.score += 100; // “G‚ğ“|‚·‚Æƒ|ƒCƒ“ƒg‰ÁZ
+                game.score += 100; // ãƒã‚¤ãƒ³ãƒˆåŠ ç®—
             }
         }
 
+        // ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã¨æ•µãŒã¶ã¤ã‹ã£ãŸã¨ã
         if (enemy.x < 147 && enemy.x > 22 &&
             300 - game.y - 26 < enemy.y + 29 && 300 - game.y + 26 > enemy.y - 29) {
-            game.state = GAME_OVER;
+
+            if (game.life == 1) {
+                game.life = 0;
+                game.state = GAME_OVER;
+            }
+            else if (game.life > 1) {
+                game.life--;
+                game.hitTimer = 60;
+            }
+
+            // æ•µã‚’ãƒªã‚¹ãƒãƒ¼ãƒ³
+            enemy.x = 640 + GetRand(200);
+            enemy.spawn = GetRand(300) + 600;
         }
     }
 }
 
 
+
 int titleBGM, playingBGM, gameOverBGM, startSE, enemyHitSE, moveSE, shootSE;
 
-// Menu‰æ–Ê‚Åbgm1‚ğƒŠƒs[ƒg
-// PLAYING‚Å‚àbgm2‚ğƒŠƒs[ƒg
-// GAMEOVER‚É‚È‚Á‚½‚çbgm3‚ğƒŠƒs[ƒg
+// Menuç”»é¢ã§bgm1ã‚’ãƒªãƒ”ãƒ¼ãƒˆ
+// PLAYINGã§ã‚‚bgm2ã‚’ãƒªãƒ”ãƒ¼ãƒˆ
+// GAMEOVERã«ãªã£ãŸã‚‰bgm3ã‚’ãƒªãƒ”ãƒ¼ãƒˆ
 
 void LoadSounds() {
     titleBGM = LoadSoundMem("bgm/title.wav");
@@ -224,7 +248,7 @@ void LoadSounds() {
     moveSE = LoadSoundMem("sound/move.wav");
     shootSE = LoadSoundMem("sound/shoot.wav");
 
-    // BGM‚ğƒ‹[ƒvÄ¶
+    // BGMã‚’ãƒ«ãƒ¼ãƒ—å†ç”Ÿ
     PlaySoundMem(titleBGM, DX_PLAYTYPE_LOOP); 
     PlaySoundMem(playingBGM, DX_PLAYTYPE_LOOP);
     PlaySoundMem(gameOverBGM, DX_PLAYTYPE_LOOP);
@@ -235,13 +259,12 @@ void PlaySE(int sound) {
 }
 
 
-
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ChangeWindowMode(TRUE);
     DxLib_Init();
     SetDrawScreen(DX_SCREEN_BACK);
 
-    int charactor1 = LoadGraph("fig/charactor01.png");
+    int charactor = LoadGraph("fig/charactor.png");
     int back[3] = { LoadGraph("fig/back01.jpg"), LoadGraph("fig/back02.jpg"), LoadGraph("fig/back03.jpg") };
 
     game.state = MENU;
@@ -257,20 +280,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         }
 
         if (game.state == PAUSED) {
-            // ”wŒi‚ğ•`‰æ‚µ‚ÄƒQ[ƒ€‰æ–Ê‚ğ‚¤‚Á‚·‚çŒ©‚¹‚é
+            // èƒŒæ™¯ã‚’æç”»ã—ã¦ã‚²ãƒ¼ãƒ ç”»é¢ã‚’ã†ã£ã™ã‚‰è¦‹ã›ã‚‹
             DrawRotaGraph(x1, 240, 0.625, 0.0, back[i % 3], TRUE);
             DrawRotaGraph(x2, 240, 0.625, 0.0, back[i % 3], TRUE);
-            DrawRotaGraph(60, 300 - game.y, 0.1, 0.0, charactor1, TRUE);
+            DrawRotaGraph(60, 300 - game.y, 0.1, 0.0, charactor, TRUE);
 
-            // ”¼“§–¾ƒŒƒCƒ„[‚ğd‚Ë‚é
+            // åŠé€æ˜ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’é‡ã­ã‚‹
             SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
             DrawBox(0, 0, 640, 480, GetColor(100, 100, 100), TRUE);
             SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-            // ƒ|[ƒYƒƒbƒZ[ƒW
-            DrawFormatString(230, 230, GetColor(255, 255, 255), "Space‚ğ‰Ÿ‚µ‚ÄÄŠJ");
+            // ãƒãƒ¼ã‚ºãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+            DrawFormatString(230, 230, GetColor(255, 255, 255), "Spaceã‚’æŠ¼ã—ã¦å†é–‹");
 
-            // ƒQ[ƒ€ŠJn
+            // ã‚²ãƒ¼ãƒ é–‹å§‹
             if (Key[KEY_INPUT_SPACE] == 1) {
                 game.state = PLAYING;
             }
@@ -281,15 +304,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             DrawBox(0, 0, 640, 480, GetColor(100, 100, 100), TRUE);
             SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-            DrawExtendGraph(0, -35, 640, 480, titlelogo, TRUE); // ƒ^ƒCƒgƒ‹
+            DrawExtendGraph(0, -35, 640, 480, titlelogo, TRUE); // ã‚¿ã‚¤ãƒˆãƒ«
 
-            // Å‚ƒXƒRƒA‚Ì•\¦‚ğƒƒS‚Ì‰º‚É”z’u
-            int text_x = 320 - GetDrawFormatStringWidth("Å‚ƒXƒRƒA: %d (%dm)", game.high_score, game.L_max) / 2;
-            DrawFormatString(text_x, 420, GetColor(75, 0, 130), "Å‚ƒXƒRƒA: %d (%dm)", game.high_score, game.L_max);
+            // æœ€é«˜ã‚¹ã‚³ã‚¢ã®è¡¨ç¤ºã‚’ãƒ­ã‚´ã®ä¸‹ã«é…ç½®
+            int text_x = 320 - GetDrawFormatStringWidth("æœ€é«˜ã‚¹ã‚³ã‚¢: %d (%dm)", game.high_score, game.L_max) / 2;
+            DrawFormatString(text_x, 420, GetColor(75, 0, 130), "æœ€é«˜ã‚¹ã‚³ã‚¢: %d (%dm)", game.high_score, game.L_max);
 
-            // SPACEƒL[‚ÌƒeƒLƒXƒg‚à‚³‚ç‚É‰º‚É”z’u
-            text_x = 320 - GetDrawFormatStringWidth("SPACE‚ğ‰Ÿ‚µ‚ÄƒXƒ^[ƒg") / 2;
-            DrawFormatString(text_x, 450, GetColor(0, 0, 0), "SPACE‚ğ‰Ÿ‚µ‚ÄƒXƒ^[ƒg");
+            // SPACEã‚­ãƒ¼ã®ãƒ†ã‚­ã‚¹ãƒˆã‚‚ã•ã‚‰ã«ä¸‹ã«é…ç½®
+            text_x = 320 - GetDrawFormatStringWidth("SPACEã‚’æŠ¼ã—ã¦ã‚¹ã‚¿ãƒ¼ãƒˆ") / 2;
+            DrawFormatString(text_x, 450, GetColor(0, 0, 0), "SPACEã‚’æŠ¼ã—ã¦ã‚¹ã‚¿ãƒ¼ãƒˆ");
 
             if (Key[KEY_INPUT_SPACE] == 1) {
                 game.state = PLAYING;
@@ -304,28 +327,43 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 x2 = 1280;
             }
 
-            // 10000m‚²‚Æ‚É”wŒiØ‚è‘Ö‚¦
-            if (game.L % 5000 == 0) {
-                i = (i + 1) % 3;
-            }
-
+            // èƒŒæ™¯
             DrawRotaGraph(x1, 240, 0.625, 0.0, back[i % 3], TRUE);
             DrawRotaGraph(x2, 240, 0.625, 0.0, back[i % 3], TRUE);
 
             game.L += 2;
-            DrawFormatString(20, 10, GetColor(0, 255, 0), "%dm", game.L);
+            //DrawFormatString(20, 10, GetColor(0, 255, 0), "%dm", game.L);
+            if (game.L % 10000 == 0) i = (i + 1) % 3; // 10000mã”ã¨ã«èƒŒæ™¯åˆ‡ã‚Šæ›¿ãˆ
 
-            if (game.L % 1000 == 0) game.score += 300; // 1000m‚²‚Æ‚Éƒ|ƒCƒ“ƒg‰ÁZ
-            if ((game.L - game.shot) == 5000 && game.bulletnum < 5) game.bulletnum++; // ’e‚ğŒ‚‚Á‚Ä‚©‚ç5000m‚²‚Æ‚É’e’Ç‰Á
+            if (game.L % 1000 == 0) game.score += 300; // 1000mã”ã¨ã«ãƒã‚¤ãƒ³ãƒˆåŠ ç®—
+            if ((game.L - game.shot) == 10000 && game.bulletnum < 3) game.bulletnum++; // å¼¾ã‚’æ’ƒã£ã¦ã‹ã‚‰10000mã”ã¨ã«å¼¾è¿½åŠ 
             
-            DrawFormatString(100, 10, GetColor(195, 144, 22), "Score:%d", game.score);
-            DrawFormatString(400, 10, GetColor(255, 0, 0), "Press A: attack %d/5", game.bulletnum);
 
+            DrawFormatString(125, 10, GetColor(195, 144, 22), "Score:%d", game.score);
+            DrawFormatString(400, 10, GetColor(255, 0, 0), "Press D: attack %d/3", game.bulletnum);
+
+            for (int i = 0; i < game.life; i++) {
+                DrawRotaGraph(35 + i * 30, 20, 0.1, 0.0, heartIMG, TRUE);
+            }
+
+			// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®ç§»å‹•
             if (Key[KEY_INPUT_UP] >= 1 && game.y < 220) game.y += 6;
             if (Key[KEY_INPUT_DOWN] >= 1 && game.y > 0) game.y -= 6;
-            DrawRotaGraph(60, 300 - game.y, 0.1, 0.0, charactor1, TRUE);
+            
+			// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®æç”»
+            if (game.life > 0) {
+                if (game.hitTimer > 0) {
+                    game.hitTimer--;
+                    if (game.hitTimer % 10 < 5) {
+                        DrawRotaGraph(60, 300 - game.y, 0.1, 0.0, charactor, TRUE);
+                    }
+                }
+                else {
+                    DrawRotaGraph(60, 300 - game.y, 0.1, 0.0, charactor, TRUE);
+                }
+            }
 
-            if (Key[KEY_INPUT_A] == 1 && game.bulletnum > 0) {
+            if (Key[KEY_INPUT_D] == 1 && game.bulletnum > 0) {
                 FireBullet(game);
                 PlaySE(shootSE);
             }
@@ -333,34 +371,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             UpdateEnemies(game);
         }
         else if (game.state == GAME_OVER) {
-            // ”wŒi‚ğ•`‰æ‚µ‚ÄƒQ[ƒ€‰æ–Ê‚ğ‚¤‚Á‚·‚çŒ©‚¹‚é
+            // èƒŒæ™¯ã‚’æç”»ã—ã¦ã‚²ãƒ¼ãƒ ç”»é¢ã‚’ã†ã£ã™ã‚‰è¦‹ã›ã‚‹
             DrawRotaGraph(x1, 240, 0.625, 0.0, back[i % 3], TRUE);
             DrawRotaGraph(x2, 240, 0.625, 0.0, back[i % 3], TRUE);
-            DrawRotaGraph(60, 300 - game.y, 0.1, 0.0, charactor1, TRUE);
 
-            // ”¼“§–¾ƒŒƒCƒ„[‚ğd‚Ë‚é
+            // åŠé€æ˜ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’é‡ã­ã‚‹
             SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
             DrawBox(0, 0, 640, 480, GetColor(100, 100, 100), TRUE);
             SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-            // Å‚‹L˜^‚ÌXV
+            // æœ€é«˜è¨˜éŒ²ã®æ›´æ–°
             SaveHighScore(game);
 
-            // GAME OVER ƒƒbƒZ[ƒW
-            SetFontSize(48); // ƒtƒHƒ“ƒgƒTƒCƒY‚ğ‘å‚«‚­‚·‚é
+            // GAME OVER ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+            SetFontSize(48); // ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’å¤§ããã™ã‚‹
 
             int text_x = 320 - GetDrawFormatStringWidth("GAME OVER") / 2;
             DrawFormatString(text_x, 120, GetColor(255, 0, 0), "GAME OVER");
-            SetFontSize(20); // ‘¼‚ÌƒeƒLƒXƒg‚Í’ÊíƒTƒCƒY
+            SetFontSize(20); // ä»–ã®ãƒ†ã‚­ã‚¹ãƒˆã¯é€šå¸¸ã‚µã‚¤ã‚º
 
-            text_x = 320 - GetDrawFormatStringWidth("ƒXƒRƒA: %d (%dm)", game.score, game.L) / 2;
-            DrawFormatString(text_x, 230, GetColor(255, 255, 255), "ƒXƒRƒA: %d (%dm)", game.score, game.L);
+            text_x = 320 - GetDrawFormatStringWidth("ã‚¹ã‚³ã‚¢: %d (%dm)", game.score, game.L) / 2;
+            DrawFormatString(text_x, 230, GetColor(255, 255, 255), "ã‚¹ã‚³ã‚¢: %d (%dm)", game.score, game.L);
 
-            text_x = 320 - GetDrawFormatStringWidth("Å‚ƒXƒRƒA: %d (%dm)", game.high_score, game.L_max) / 2;
-            DrawFormatString(text_x, 290, GetColor(255, 255, 0), "Å‚ƒXƒRƒA: %d (%dm)", game.high_score, game.L_max);
+            text_x = 320 - GetDrawFormatStringWidth("æœ€é«˜ã‚¹ã‚³ã‚¢: %d (%dm)", game.high_score, game.L_max) / 2;
+            DrawFormatString(text_x, 290, GetColor(255, 255, 0), "æœ€é«˜ã‚¹ã‚³ã‚¢: %d (%dm)", game.high_score, game.L_max);
 
-            text_x = 320 - GetDrawFormatStringWidth("Space‚ğ‰Ÿ‚µ‚ÄƒŠƒXƒ^[ƒg") / 2;
-            DrawFormatString(text_x, 330, GetColor(255, 255, 255), "Space‚ğ‰Ÿ‚µ‚ÄƒŠƒXƒ^[ƒg");
+            text_x = 320 - GetDrawFormatStringWidth("Spaceã‚’æŠ¼ã—ã¦ãƒªã‚¹ã‚¿ãƒ¼ãƒˆ") / 2;
+            DrawFormatString(text_x, 330, GetColor(255, 255, 255), "Spaceã‚’æŠ¼ã—ã¦ãƒªã‚¹ã‚¿ãƒ¼ãƒˆ");
 
             if (Key[KEY_INPUT_SPACE] == 1) {
                 InitGame(game);
