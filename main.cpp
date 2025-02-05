@@ -304,6 +304,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 x2 = 1280;
             }
 
+            // 10000mÇ≤Ç∆Ç…îwåiêÿÇËë÷Ç¶
+            if (game.L % 5000 == 0) {
+                i = (i + 1) % 3;
+            }
+
             DrawRotaGraph(x1, 240, 0.625, 0.0, back[i % 3], TRUE);
             DrawRotaGraph(x2, 240, 0.625, 0.0, back[i % 3], TRUE);
 
