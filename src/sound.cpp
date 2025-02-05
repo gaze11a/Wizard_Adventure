@@ -1,21 +1,23 @@
 #include "DxLib.h"
 #include "sound.h"
 
-int titleBGM, playingBGM, gameOverBGM, startSE, pauseSE, enemyHitSE, moveSE, shootSE;
+// startSEはPause時にも使う
+// 音が消えてから（1s待ってから）ゲームスタート
+
+int titleBGM, playingBGM;
+int startSE, hitSE, shootSE;
 
 // サウンドの読み込み
 void LoadSounds() {
     titleBGM = LoadSoundMem("assets/bgm/title.mp3");
     playingBGM = LoadSoundMem("assets/bgm/playing.mp3");
-    gameOverBGM = LoadSoundMem("assets/bgm/gameover.mp3");
 
-    startSE = LoadSoundMem("assets/sound/start.wav");
-    pauseSE = LoadSoundMem("assets/sound/start.wav");
-    enemyHitSE = LoadSoundMem("assets/sound/hit.wav");
-    moveSE = LoadSoundMem("assets/sound/move.wav");
-    shootSE = LoadSoundMem("assets/sound/shoot.wav");
+    startSE = LoadSoundMem("assets/sound/start.mp3");
+    hitSE = LoadSoundMem("assets/sound/hit.mp3");
+    shootSE = LoadSoundMem("assets/sound/shoot.mp3");
 
     ChangeVolumeSoundMem(200, titleBGM);
+    ChangeVolumeSoundMem(200, playingBGM);
 }
 
 // 効果音を再生
