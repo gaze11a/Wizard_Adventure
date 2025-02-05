@@ -9,7 +9,6 @@
 
 // 未実装機能
 // 
-// 即死ドラゴンの追加
 // 宝箱の追加
 // 効果音の追加
 
@@ -21,7 +20,7 @@ struct Bullet {
 };
 
 struct Enemy {
-    int x, y, spawn;
+    int x, y, spawn, isDragon;
 };
 
 enum GameState {
@@ -66,6 +65,7 @@ int gpUpdateKey() {
 // 画像
 int bulletIMG;
 int enemyIMG;
+int dragonIMG;
 int heartIMG;
 int titlelogo;
 
@@ -87,6 +87,7 @@ void InitGame(Game& game) {
     game.shot = 0;
 
     enemyIMG = LoadGraph("fig/fire.png");
+    dragonIMG = LoadGraph("fig/dragon.png");
 	heartIMG = LoadGraph("fig/heart.png");
 
     int baseX = 640; // 基準となるX座標
@@ -195,41 +196,69 @@ void UpdateEnemies(Game& game) {
             enemy.x = prevX + GetRand(maxGap - minGap) + minGap; // 直前の敵との間隔を確保
             enemy.y = 120 + i * 100;  // Y位置を一定間隔で維持
             enemy.spawn = GetRand(300) + 600; // 次のスポーンを遅くする
+
+            if (game.L >= 10000) {
+                int dragonChance = min(10 + (game.L / 5000) * 5, 50); // 最大50%の確率
+                if (GetRand(100) < dragonChance) {
+                    enemy.isDragon = true;
+                }
+                else {
+                    enemy.isDragon = false;
+                }
+            }
+            else {
+                enemy.isDragon = false;
+            }
         }
 
-        DrawRotaGraph(enemy.x, enemy.y, 0.12, 0.0, enemyIMG, TRUE);
+        if (enemy.isDragon) {
+            DrawRotaGraph(enemy.x, enemy.y, 0.3, 0.0, dragonIMG, TRUE);
+        }
+        else {
+            DrawRotaGraph(enemy.x, enemy.y, 0.12, 0.0, enemyIMG, TRUE);
+        }
 
         for (int j = 0; j < MAX_BULLETS; j++) {
             if (game.bullets[j].active && CheckCollision(game.bullets[j], enemy)) {
+                game.bullets[j].active = false;
+
+				// ポイント加算
+                if (enemy.isDragon) {
+                    game.score += 500;
+                }
+                else {
+                    game.score += 100;
+                }
+
                 int prevX = (i == 0) ? 640 : game.enemies[i - 1].x;
                 enemy.x = prevX + GetRand(maxGap - minGap) + minGap; // 敵をリスポーン
                 enemy.y = 120 + i * 100;
                 enemy.spawn = GetRand(300) + 600;
-                game.bullets[j].active = false;
-                game.score += 100; // ポイント加算
             }
         }
 
         // キャラクターと敵がぶつかったとき
         if (enemy.x < 147 && enemy.x > 22 &&
             300 - game.y - 26 < enemy.y + 29 && 300 - game.y + 26 > enemy.y - 29) {
-
-            if (game.life == 1) {
-                game.life = 0;
+            if (enemy.isDragon) {
                 game.state = GAME_OVER;
-            }
-            else if (game.life > 1) {
-                game.life--;
-                game.hitTimer = 60;
-            }
-
+			}
+			else {
+				if (game.life == 1) {
+					game.life = 0;
+					game.state = GAME_OVER;
+				}
+				else if (game.life > 1) {
+					game.life--;
+					game.hitTimer = 60;
+				}
+			}
             // 敵をリスポーン
             enemy.x = 640 + GetRand(200);
             enemy.spawn = GetRand(300) + 600;
         }
     }
 }
-
 
 
 int titleBGM, playingBGM, gameOverBGM, startSE, enemyHitSE, moveSE, shootSE;
