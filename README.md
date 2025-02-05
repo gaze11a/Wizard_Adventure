@@ -7,14 +7,7 @@
 火の玉やドラゴンを避けながら、魔法を放って敵を倒そう！
 
 ## 📸 ゲーム画面
-### 【タイトル画面】
-![タイトル画面](https://github.com/gaze11a/Wizard_Adventure/blob/master/assets/screenshots/title.png?raw=true)
-
-### 【プレイ画面】
 ![プレイ画面](https://github.com/gaze11a/Wizard_Adventure/blob/master/assets/screenshots/gameplay.png?raw=true)
-
-### 【ゲームオーバー画面】
-![ゲームオーバー画面](https://github.com/gaze11a/Wizard_Adventure/blob/master/assets/screenshots/gameover.png?raw=true)
 
 ---
 
