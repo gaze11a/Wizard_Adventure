@@ -1,15 +1,16 @@
 #include "DxLib.h"
 #include "sound.h"
 
-int titleBGM, playingBGM, gameOverBGM, startSE, enemyHitSE, moveSE, shootSE;
+int titleBGM, playingBGM, gameOverBGM, startSE, pauseSE, enemyHitSE, moveSE, shootSE;
 
 // ÉTÉEÉìÉhÇÃì«Ç›çûÇ›
 void LoadSounds() {
     titleBGM = LoadSoundMem("assets/bgm/title.mp3");
-    playingBGM = LoadSoundMem("assets/bgm/playing.wav");
-    gameOverBGM = LoadSoundMem("assets/bgm/gameover.wav");
+    playingBGM = LoadSoundMem("assets/bgm/playing.mp3");
+    gameOverBGM = LoadSoundMem("assets/bgm/gameover.mp3");
 
     startSE = LoadSoundMem("assets/sound/start.wav");
+    pauseSE = LoadSoundMem("assets/sound/start.wav");
     enemyHitSE = LoadSoundMem("assets/sound/hit.wav");
     moveSE = LoadSoundMem("assets/sound/move.wav");
     shootSE = LoadSoundMem("assets/sound/shoot.wav");

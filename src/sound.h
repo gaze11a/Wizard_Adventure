@@ -3,7 +3,7 @@
 
 #include "DxLib.h"
 
-extern int titleBGM, playingBGM, gameOverBGM, startSE, enemyHitSE, moveSE, shootSE;
+extern int titleBGM, playingBGM, gameOverBGM, startSE, pauseSE, enemyHitSE, moveSE, shootSE;
 
 void LoadSounds();
 void PlaySE(int sound);

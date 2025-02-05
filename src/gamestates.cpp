@@ -27,30 +27,8 @@ void HandleMenu(Game& game) {
     if (Key[KEY_INPUT_SPACE] == 1) {
         game.state = PLAYING;
         StopSoundMem(titleBGM);
+        PlaySoundMem(playingBGM, DX_PLAYTYPE_LOOP);
         PlaySE(startSE);
-    }
-}
-
-void HandlePause(Game& game) {
-    if (CheckSoundMem(titleBGM) == 1) {
-        StopSoundMem(titleBGM);
-    }
-    // 背景を描画してゲーム画面をうっすら見せる
-    DrawRotaGraph(game.x1, 240, 0.625, 0.0, back[game.i % 3], TRUE);
-    DrawRotaGraph(game.x2, 240, 0.625, 0.0, back[game.i % 3], TRUE);
-    DrawRotaGraph(60, 300 - game.y, 0.1, 0.0, charactor, TRUE);
-
-    // 半透明レイヤーを重ねる
-    SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
-    DrawBox(0, 0, 640, 480, GetColor(100, 100, 100), TRUE);
-    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-    // ポーズメッセージ
-    DrawFormatString(230, 230, GetColor(255, 255, 255), "Spaceを押して再開");
-
-    // ゲーム開始
-    if (Key[KEY_INPUT_SPACE] == 1) {
-        game.state = PLAYING;
     }
 }
 
@@ -58,6 +36,10 @@ void HandlePlaying(Game& game) {
     if (CheckSoundMem(titleBGM) == 1) {
         StopSoundMem(titleBGM);
     }
+    if (CheckSoundMem(playingBGM) == 0) {
+        PlaySoundMem(playingBGM, DX_PLAYTYPE_LOOP);
+    }
+
 
     game.x1 -= 2;
     if (game.x1 <= 0) game.x2 -= 2;
@@ -110,7 +92,37 @@ void HandlePlaying(Game& game) {
     UpdateEnemies(game);
 }
 
+void HandlePause(Game& game) {
+    if (CheckSoundMem(titleBGM) == 1) {
+        StopSoundMem(titleBGM);
+    }
+    // 背景を描画してゲーム画面をうっすら見せる
+    DrawRotaGraph(game.x1, 240, 0.625, 0.0, back[game.i % 3], TRUE);
+    DrawRotaGraph(game.x2, 240, 0.625, 0.0, back[game.i % 3], TRUE);
+    DrawRotaGraph(60, 300 - game.y, 0.1, 0.0, charactor, TRUE);
+
+    // 半透明レイヤーを重ねる
+    SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+    DrawBox(0, 0, 640, 480, GetColor(100, 100, 100), TRUE);
+    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+    // ポーズメッセージ
+    DrawFormatString(230, 230, GetColor(255, 255, 255), "Spaceを押して再開");
+
+    // ゲーム開始
+    if (Key[KEY_INPUT_SPACE] == 1) {
+        game.state = PLAYING;
+    }
+}
+
 void HandleGameOver(Game& game) {
+    if (CheckSoundMem(titleBGM) == 1) {
+        StopSoundMem(titleBGM);
+    }
+    if (CheckSoundMem(playingBGM) == 1) {
+        StopSoundMem(playingBGM);
+    }
+
     // 背景を描画してゲーム画面をうっすら見せる
     DrawRotaGraph(game.x1, 240, 0.625, 0.0, back[game.i % 3], TRUE);
     DrawRotaGraph(game.x2, 240, 0.625, 0.0, back[game.i % 3], TRUE);
