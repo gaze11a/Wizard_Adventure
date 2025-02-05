@@ -6,8 +6,8 @@
 魔法使いが飛び続ける横スクロールアクションゲーム！  
 火の玉やドラゴンを避けながら、魔法を放って敵を倒そう！
 
-## 📸 ゲームプレイ映像
-![プレイ画面](https://github.com/gaze11a/Wizard_Adventure/blob/master/assets/screenshots/gameplay.png?raw=true)
+## 🎥 ゲームプレイ動画
+[![ゲームプレイ](https://img.youtube.com/vi/6HVtYUd7e3c/0.jpg)](https://www.youtube.com/watch?v=6HVtYUd7e3c)
 
 ---
 
