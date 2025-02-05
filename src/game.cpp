@@ -1,4 +1,5 @@
 #include "game.h"
+#include "sound.h"
 #include "DxLib.h"
 #include <stdio.h>
 
@@ -32,7 +33,7 @@ void InitGame(Game& game) {
     for (int i = 0; i < MAX_BULLETS; i++) {
         game.bullets[i] = { 60, false }; // x座標, y座標
     }
-    game.bulletnum = 3;
+    game.bulletnum = 5;
     game.shot = 0;
 
     enemyIMG = LoadGraph("assets/fig/fire.png");
@@ -79,10 +80,13 @@ void SaveHighScore(Game& game) {
 }
 
 bool CheckCollision(Bullet bullet, Enemy enemy) {
-    return bullet.x >= enemy.x &&
-        300 - game.y > enemy.y - 29 &&
-        300 - game.y < enemy.y + 29;
+	int hitboxExpansion = 20; // 当たり判定を広げる
+
+    return bullet.x >= enemy.x - 20 && bullet.x <= enemy.x + 20 && 
+        bullet.y >= enemy.y - (29 + hitboxExpansion) && // y方向の下限
+		bullet.y <= enemy.y + (29 + hitboxExpansion); // y方向の上限
 }
+
 
 void UpdateBullets(Game& game) {
 
@@ -191,6 +195,8 @@ void UpdateEnemies(Game& game) {
         // キャラクターと敵がぶつかったとき
         if (enemy.x < 147 && enemy.x > 22 &&
             300 - game.y - 26 < enemy.y + 29 && 300 - game.y + 26 > enemy.y - 29) {
+			PlaySE(hitSE);
+
             if (enemy.isDragon) {
                 game.state = GAME_OVER;
             }

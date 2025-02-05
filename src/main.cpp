@@ -8,7 +8,6 @@
 // 未実装機能
 // 
 // 宝箱の追加
-// 効果音の追加
 
 Game game;
 
@@ -24,8 +23,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     while (ScreenFlip() == 0 && ProcessMessage() == 0 && ClearDrawScreen() == 0 && gpUpdateKey() == 0) {
         if (Key[KEY_INPUT_ESCAPE] == 1) {
-            if (game.state == PLAYING) game.state = PAUSED;
-            else if (game.state == PAUSED) game.state = PLAYING;
+            if (game.state == PLAYING) {
+                PlaySE(switchSE);
+                game.state = PAUSED;
+            }
+            else if (game.state == PAUSED) {
+                PlaySE(switchSE);
+                game.state = PLAYING;
+            }
         }
 
         switch (game.state) {
@@ -41,6 +46,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         case GAME_OVER:
             HandleGameOver(game);
             break;
+        case MENU_SETTINGS:
+        case PAUSE_SETTINGS:
+        case GAMEOVER_SETTINGS:
+			HandleSettings(game);
+			break;
         }
     }
     DxLib_End();

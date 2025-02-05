@@ -4,7 +4,7 @@
 #include "DxLib.h"
 
 extern int titleBGM, playingBGM;
-extern int startSE, hitSE, shootSE;
+extern int switchSE, hitSE, shootSE;
 
 void LoadSounds();
 void PlaySE(int sound);

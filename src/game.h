@@ -21,7 +21,10 @@ enum GameState {
     MENU = 0,
     PAUSED = 1,
     PLAYING = 2,
-    GAME_OVER = 3
+	GAME_OVER = 3,
+	MENU_SETTINGS = 4,
+	PAUSE_SETTINGS = 5,
+	GAMEOVER_SETTINGS = 6
 };
 
 // ゲームのグローバルデータ
