@@ -3,7 +3,7 @@
 #include "gamestates.h"
 #include "input.h"
 #include "sound.h"
-#include <stdio.h>
+#include "score.h"
 
 // 未実装機能
 // 

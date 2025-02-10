@@ -3,6 +3,7 @@
 #include "gamestates.h"
 #include "input.h"
 #include "sound.h"
+#include "score.h"
 
 void HandleMenu(Game& game) {
     if (CheckSoundMem(titleBGM) == 0) {

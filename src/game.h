@@ -60,8 +60,8 @@ extern Game game;
 
 // ÉQÅ[ÉÄä÷òAÇÃä÷êî
 void InitGame(Game& game);
-void LoadHighScore(Game& game);
-void SaveHighScore(Game& game);
+// void LoadHighScore(Game& game);
+// void SaveHighScore(Game& game);
 
 bool CheckCollisionWithBullet(Bullet bullet, Enemy enemy);
 bool CheckCollisionWithPlayer(Game& game, Enemy enemy);

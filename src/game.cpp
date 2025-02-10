@@ -1,7 +1,6 @@
 #include "game.h"
 #include "sound.h"
 #include "DxLib.h"
-#include <stdio.h>
 
 int charactor;
 int back[3];
@@ -52,6 +51,7 @@ void InitGame(Game& game) {
     }
 }
 
+/*
 void LoadHighScore(Game& game) {
     FILE* fp;
     fopen_s(&fp, "assets/save.dat", "rb");
@@ -78,6 +78,7 @@ void SaveHighScore(Game& game) {
         fclose(fp);
     }
 }
+*/
 
 bool CheckCollisionWithBullet(Bullet bullet, Enemy enemy) {
 	int hitboxExpansion = 20; // ìñÇΩÇËîªíËÇçLÇ∞ÇÈ

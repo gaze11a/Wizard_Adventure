@@ -23,12 +23,14 @@
     <ClCompile Include="src\gamestates.cpp" />
     <ClCompile Include="src\input.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\score.cpp" />
     <ClCompile Include="src\sound.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\gamestates.h" />
     <ClInclude Include="src\input.h" />
+    <ClInclude Include="src\score.h" />
     <ClInclude Include="src\sound.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
